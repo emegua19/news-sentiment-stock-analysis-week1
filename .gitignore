@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python compiled files
+*.pyc
+__pycache__/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Data files
+*.csv
+*.whl
+
+# IDE settings
+.vscode/
+*.code-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
