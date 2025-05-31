@@ -24,7 +24,7 @@ def load_stock_data(file_path, expected_columns=['Date', 'Open', 'High', 'Low', 
         numeric_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
         for col in numeric_cols:
             if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
+                df[col] = pd.to_numeric(df[col], errors='coerce').astype(np.float64)
         df = df.sort_values('Date')
         return df
     except Exception as e:
@@ -37,11 +37,21 @@ def compute_technical_indicators(df, price_column='Close', high_column='High', l
     Allows custom column names for flexibility.
     References: https://mrjbq7.github.io/ta-lib/, https://www.investopedia.com/terms/t/technicalindicator.asp
     """
+    if not all(col in df.columns for col in [price_column, high_column, low_column]):
+        raise ValueError(f"Required columns missing: {price_column}, {high_column}, or {low_column} not in DataFrame.")
+    
+    if len(df) < 26:  # Minimum length for MACD (slowperiod=26)
+        raise ValueError(f"Insufficient data points ({len(df)}). Need at least 26 rows for indicator calculations.")
+    
     df = df.copy()
-    # Ensure float64 for TA-Lib
-    df[price_column] = df[price_column].astype(np.float64)
-    df[high_column] = df[high_column].astype(np.float64)
-    df[low_column] = df[low_column].astype(np.float64)
+    
+    # Ensure float64 for TA-Lib and handle NaNs
+    df[price_column] = pd.to_numeric(df[price_column], errors='coerce').astype(np.float64)
+    df[high_column] = pd.to_numeric(df[high_column], errors='coerce').astype(np.float64)
+    df[low_column] = pd.to_numeric(df[low_column], errors='coerce').astype(np.float64)
+    
+    # Drop rows with NaN in required columns to avoid TA-Lib errors
+    df = df.dropna(subset=[price_column, high_column, low_column])
     
     # Simple Moving Average (SMA-20)
     df['SMA_20'] = talib.SMA(df[price_column], timeperiod=20)
@@ -74,15 +84,33 @@ def compute_financial_metrics(df, price_column='Close'):
     """
     Compute financial metrics: returns, volatility, Sharpe ratio, cumulative returns.
     Allows custom price column name.
+
     References: https://www.investopedia.com/terms/s/sharperatio.asp
     """
+    if price_column not in df.columns:
+        raise ValueError(f"Column '{price_column}' not found in DataFrame.")
+    
+    if len(df) < 20:  # Minimum length for 20-day rolling calculations
+        raise ValueError(f"Insufficient data points ({len(df)}). Need at least 20 rows for metric calculations.")
+    
     df = df.copy()
+
     # Daily log returns
     df['Returns'] = np.log(df[price_column] / df[price_column].shift(1))
+    
     # Annualized volatility (20-day rolling)
     df['Volatility'] = df['Returns'].rolling(window=20).std() * np.sqrt(252)
-    # Sharpe ratio (risk-free rate = 0 for simplicity)
-    df['Sharpe'] = (df['Returns'].rolling(window=20).mean() * 252) / df['Volatility']
+    
+    # Rolling Sharpe ratio (risk-free rate = 0 for simplicity)
+    df['Sharpe_Rolling'] = (df['Returns'].rolling(window=20).mean() * 252) / df['Volatility']
+    
+    # Overall Sharpe ratio (annualized, assuming 252 trading days)
+    risk_free_rate = 0.0  # Simplified for the challenge
+    mean_return = df['Returns'].mean() * 252
+    std_return = df['Returns'].std() * np.sqrt(252)
+    df['Sharpe'] = (mean_return - risk_free_rate) / std_return if std_return != 0 else 0
+    
     # Cumulative returns
     df['Cum_Returns'] = (1 + df['Returns']).cumprod() - 1
+    
     return df
