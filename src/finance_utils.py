@@ -1,5 +1,3 @@
-# src/finance_utils.py
-
 import pandas as pd
 import numpy as np
 import talib
@@ -7,15 +5,22 @@ import talib
 def load_stock_data(file_path, expected_columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume']):
     """
     Load stock data, validate columns, and convert numeric columns to float64.
+    Dynamically detects date column if 'Date' is missing.
     References: https://pandas.pydata.org/docs/user_guide/io.html#csv-text-files
     """
     try:
         df = pd.read_csv(file_path)
-        missing_cols = [col for col in expected_columns if col not in df.columns]
-        if missing_cols:
-            raise ValueError(f"Missing columns: {missing_cols}")
-        df['Date'] = pd.to_datetime(df['Date'], utc=True)
-        # Convert numeric columns to float64, handling errors
+        # Dynamically detect date column
+        date_col = None
+        for col in df.columns:
+            if 'date' in col.lower():
+                date_col = col
+                break
+        if not date_col:
+            raise KeyError(f"No date-related column found in {file_path}. Available columns: {df.columns.tolist()}")
+        df['Date'] = pd.to_datetime(df[date_col], errors='coerce').dt.date
+        
+        # Validate and convert numeric columns
         numeric_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
         for col in numeric_cols:
             if col in df.columns:
@@ -29,6 +34,7 @@ def load_stock_data(file_path, expected_columns=['Date', 'Open', 'High', 'Low', 
 def compute_technical_indicators(df, price_column='Close', high_column='High', low_column='Low'):
     """
     Compute TA-Lib indicators: SMA, RSI, MACD, Bollinger Bands, ADX, Stochastic Oscillator.
+    Allows custom column names for flexibility.
     References: https://mrjbq7.github.io/ta-lib/, https://www.investopedia.com/terms/t/technicalindicator.asp
     """
     df = df.copy()
@@ -67,10 +73,11 @@ def compute_technical_indicators(df, price_column='Close', high_column='High', l
 def compute_financial_metrics(df, price_column='Close'):
     """
     Compute financial metrics: returns, volatility, Sharpe ratio, cumulative returns.
+    Allows custom price column name.
     References: https://www.investopedia.com/terms/s/sharperatio.asp
     """
     df = df.copy()
-    # Daily log returns (manual calculation)
+    # Daily log returns
     df['Returns'] = np.log(df[price_column] / df[price_column].shift(1))
     # Annualized volatility (20-day rolling)
     df['Volatility'] = df['Returns'].rolling(window=20).std() * np.sqrt(252)
