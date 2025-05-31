@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
 # Ensure output directories exist (for saving plots or results if needed)
-os.makedirs(os.path.join(os.path.dirname(__file__), "../plots"), exist_ok=True)
+os.makedirs(os.path.join(os.path.dirname(__file__), "plots"), exist_ok=True)
 os.makedirs(os.path.join(os.path.dirname(__file__), "../data"), exist_ok=True)
 
 
@@ -234,7 +234,7 @@ def calculate_correlation(aligned_df: pd.DataFrame, lag: int = 0) -> (float, flo
     return r_value, p_value
 
 
-def plot_correlation(aligned_df: pd.DataFrame, save_path: str = '../plots/sentiment_vs_returns.png'):
+def plot_correlation(aligned_df: pd.DataFrame, save_path: str = 'plots/sentiment_vs_returns.png'):
     """
     Visualize the relationship between sentiment and stock returns as a scatter plot.
 
