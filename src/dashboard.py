@@ -93,4 +93,4 @@ Technical indicators like RSI and MACD highlighted key trading signals, while se
 
 # Footer
 st.markdown("---")
-st.markdown("Built with ❤️ using Streamlit by Yitbie for 10 Academy AIM Week 1 Challenge")
+st.markdown("Built with ❤️ using Streamlit by Yitbarek for 10 Academy AIM Week 1 Challenge")
