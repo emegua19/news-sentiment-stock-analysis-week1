@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]  # Only main pushes trigger CI
+    branches: [main]
   pull_request:
-    branches: [main]  # Only PRs to main trigger CI
+    branches: [main]
 
 jobs:
   test:
@@ -12,27 +12,29 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.8', '3.10', '3.12']
+        python-version: ['3.10', '3.11', '3.12']  # Removed 3.8 due to pandas==2.2.2 requiring 3.9+
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4  # Updated to v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5  # Updated to v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4  # Updated to v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          pip cache purge  # Clear cache to avoid stale data
+          pip install -r requirements.txt --index-url https://pypi.org/simple
 
       - name: Check Python version
         run: python --version

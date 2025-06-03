@@ -1,3 +1,4 @@
+````markdown
 # AIM Week 1 Project: Predicting Price Moves with News Sentiment
 
 This project analyzes news sentiment to predict stock price movements using the FNSPID dataset for the **10 Academy AIM Week 1 Challenge**.
@@ -14,9 +15,9 @@ Correlate financial news sentiment with **Apple (AAPL)** stock price changes to 
 
 ## Datasets
 
-* `raw_analyst_ratings.csv`: Financial news headlines (>1,000,000 rows, filtered to \~300–500 rows for 2020)
-* `AAPL_historical_data.csv`: AAPL stock prices (1980–2024, focused on 2020 with \~252 rows)
-* `sp500_historical_data_2020.csv`: S\&P 500 index data for 2020 (benchmark)
+- `raw_analyst_ratings.csv`: Financial news headlines (>1,000,000 rows, filtered to ~300–500 rows for 2020)  
+- `AAPL_historical_data.csv`: AAPL stock prices (1980–2024, focused on 2020 with ~252 rows)  
+- `sp500_historical_data_2020.csv`: S&P 500 index data for 2020 (benchmark)
 
 ---
 
@@ -27,7 +28,7 @@ Correlate financial news sentiment with **Apple (AAPL)** stock price changes to 
 ```bash
 git clone https://github.com/emegua19/news-sentiment-stock-analysis-week1.git
 cd news-sentiment-stock-analysis-week1
-```
+````
 
 ### 2. Create and Activate a Virtual Environment
 
@@ -49,7 +50,7 @@ source .venv/bin/activate
 
 #### On **Windows**:
 
-1. Download the appropriate `.whl` file from [https://sourceforge.net/projects/talib-whl/files/ta_lib_0.4.28/TA_Lib-0.4.28-cp310-cp310-win_amd64.whl/download].
+1. Download the appropriate `.whl` file from [https://www.lfd.uci.edu/\~gohlke/pythonlibs/#ta-lib](https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib)
 2. Install it:
 
 ```cmd
@@ -65,16 +66,8 @@ pip install ta-lib
 
 ### 4. Install Dependencies
 
-* For deployment:
-
 ```bash
 pip install -r requirements.txt
-```
-
-* For local development:
-
-```bash
-pip install -r requirements-dev.txt
 ```
 
 ---
@@ -83,7 +76,7 @@ pip install -r requirements-dev.txt
 
 ### GitHub Actions Workflow
 
-Your CI pipeline is configured via `.github/workflows/ci.yml` to trigger on:
+CI pipeline is configured via `.github/workflows/ci.yml` to trigger on:
 
 ```yaml
 on:
@@ -96,7 +89,7 @@ on:
 It runs tests on multiple OS and Python versions:
 
 * **OS**: Ubuntu, Windows
-* **Python Versions**: 3.8, 3.10, 3.12
+* **Python Versions**: 3.10, 3.11, 3.12
 
 Includes caching and dependency installation steps.
 
@@ -113,8 +106,7 @@ LICENSE                   # Project license
 README.md                 # Project documentation
 data/                     # Dataset storage
 notebooks/                # Jupyter notebooks for analysis
-requirements.txt          # Python dependencies for deployment
-requirements-dev.txt      # Additional dependencies for local development
+requirements.txt          # Python dependencies
 scripts/                  # Additional scripts
 src/                      # Source code modules
 tests/                    # Test files
@@ -153,8 +145,8 @@ All tasks merged into `main`.
 
 #### Setup
 
-* Python 3.8, 3.10, or 3.12
-* Installed requirements from both `requirements.txt` and `requirements-dev.txt`
+* Python 3.10, 3.11, 3.12
+* Installed requirements from `requirements.txt`
 
 #### Data Cleaning
 
@@ -224,7 +216,7 @@ Functions in `src/finance_utils.py`:
 
 * Computed daily returns
 * Pearson correlation (lags: 0 to 3 days)
-* Scatter plot: `plots/sentiment_vs_returns_aapl.png`
+* Scatter plot: `task-3-plots/sentiment_vs_returns_aapl.png`
 
 Functions in `src/correlation_analysis.py`:
 
@@ -238,6 +230,8 @@ Functions in `src/correlation_analysis.py`:
 
 ## Dashboard
 
+> **Note**: Deployment postponed for future work.
+
 ### Development
 
 * Streamlit app in `src/dashboard.py`
@@ -247,19 +241,11 @@ Functions in `src/correlation_analysis.py`:
   * Charts: SMA, RSI, MACD
   * Correlation: sentiment vs. returns
 
-### Deployment
-
-* Hosted on Streamlit Community Cloud
-* [Live App](https://emegua19-2pwns-week1-project.streamlit.app)
-* Streamlit reads data from Google Drive
-* Dependencies handled via `requirements.txt`
-
 ---
 
-### Deliverables
+## Deliverables
 
 * GitHub Repo: [https://github.com/emegua19/news-sentiment-stock-analysis-week1](https://github.com/emegua19/news-sentiment-stock-analysis-week1)
-* Streamlit Dashboard: [Live App](https://emegua19-2pwns-week1-project.streamlit.app)
 
 ---
 
@@ -305,3 +291,5 @@ Functions in `src/correlation_analysis.py`:
 ## Acknowledgments
 
 Thanks to the 10 Academy team for their guidance and support. Built using Python, Streamlit, Plotly, and TA-Lib.
+
+```
