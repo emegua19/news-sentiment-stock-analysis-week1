@@ -1,72 +1,68 @@
-
 # AIM Week 1 Project: Predicting Price Moves with News Sentiment
 
 This project analyzes news sentiment to predict stock price movements using the FNSPID dataset for the **10 Academy AIM Week 1 Challenge**.
 
 ---
 
-## Project Overview
+## 📊 Project Overview
 
-### Goal
+### 🎯 Goal
 
 Correlate financial news sentiment with **Apple (AAPL)** stock price changes to inform trading strategies.
 
 ---
 
-## Datasets
+## 📁 Datasets
 
-- `raw_analyst_ratings.csv`: Financial news headlines (>1,000,000 rows, filtered to ~300–500 rows for 2020 to align with stock data timeframe and reduce computational load)  
-- `AAPL_historical_data.csv`: AAPL stock prices (1980–2024, focused on 2020 with ~252 rows)  
+- `raw_analyst_ratings.csv`: Financial news headlines (>1,000,000 rows, filtered to ~300–500 rows for 2020)
+- `AAPL_historical_data.csv`: AAPL stock prices (1980–2024, focused on 2020)
 - `sp500_historical_data_2020.csv`: S&P 500 index data for 2020 (benchmark)
 
 ---
 
-## Setup Instructions
+## ⚙️ Setup Instructions
 
 ### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/emegua19/news-sentiment-stock-analysis-week1.git
 cd news-sentiment-stock-analysis-week1
-```
+````
 
 ### 2. Create and Activate a Virtual Environment
 
-#### On **Windows**:
+#### On Windows:
 
 ```cmd
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-#### On **Ubuntu/Linux**:
+#### On Ubuntu/Linux:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install TA-Lib (Required for Local Quantitative Analysis)
+### 3. Install TA-Lib (Optional for Task 2)
 
-> **Note**: TA-Lib is needed to compute technical indicators locally for Task 2. Skip if using precomputed data.
+#### On Windows:
 
-#### On **Windows**:
-
-1. Download the appropriate `.whl` file from [https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib](https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib)
-2. Install it:
+Download and install the `.whl` file from [Gohlke's site](https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib)
 
 ```cmd
-pip install path\to\TA_Lib-<version>-cp<version>-cp<version>-win_amd64.whl
+pip install TA_Lib‑<version>.whl
 ```
 
-#### On **Ubuntu/Linux**:
+#### On Ubuntu/Linux:
 
 ```bash
 sudo apt-get install -y libta-lib0 libta-lib-dev
 pip install ta-lib
 ```
 
-### 4. Install Dependencies
+### 4. Install Project Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -74,225 +70,181 @@ pip install -r requirements.txt
 
 ---
 
-## CI/CD Pipeline
+## 📦 Python Packages Used
 
-### GitHub Actions Workflow
+* `streamlit==1.35.0`
+* `pandas==2.2.2`
+* `plotly==5.21.0`
+* `statsmodels==0.14.1`
+* `textblob==0.17.1`
+* `matplotlib==3.8.4`
+* `seaborn==0.13.2`
+* `scikit-learn==1.4.2`
+* `yfinance==0.2.40`
+* `gensim==4.3.2`
+* `numpy==1.26.4`
+* `spacy==3.7.4`
+* `python-dateutil==2.9.0.post0`
+* `keybert==0.8.5`
+* `ta-lib` (optional, for technical indicators)
 
-CI pipeline is configured via `.github/workflows/ci.yml` to trigger on:
+---
+
+## 🔄 CI/CD Pipeline
+
+Continuous Integration is implemented via **GitHub Actions** to ensure reliability across environments.
+
+### ✅ CI Workflow Configuration
+
+Triggered on:
+
+* Push to `main`
+* Pull request to `main`
+
+Runs on:
+
+* Ubuntu and Windows
+* Python 3.10, 3.11, 3.12
+
+Performs:
+
+* Dependency caching
+* Installation of packages
+* Python version check
+* Placeholder for tests
+
+### 📄 `.github/workflows/ci.yml`
 
 ```yaml
+name: CI
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip cache purge
+          pip install -r requirements.txt --index-url https://pypi.org/simple
+
+      - name: Check Python version
+        run: python --version
+
+      - name: Run tests
+        run: |
+          if [ -d tests ]; then
+            pytest tests/
+          else
+            echo "No tests defined yet."
 ```
-
-It runs unit tests (e.g., for data processing and analysis functions) on multiple OS and Python versions:
-
-- **OS**: Ubuntu, Windows
-- **Python Versions**: 3.10, 3.11, 3.12
-
-Includes caching and dependency installation steps for efficiency.
 
 ---
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 .github/                  # CI/CD workflows
-.gitignore                # Git ignore file
-.venv/                    # Virtual environment
-.vscode/                  # VS Code settings
-LICENSE                   # Project license
-README.md                 # Project documentation
 data/                     # Dataset storage
 notebooks/                # Jupyter notebooks for analysis
-requirements.txt          # Python dependencies
-scripts/                  # Additional scripts
-src/                      # Source code modules
-tests/                    # Test files
+plots/                    # Output visualizations
+scripts/                  # Helper scripts
+src/                      # Core source code
+tests/                    # Unit tests (optional)
+requirements.txt          # Dependencies
+README.md                 # Documentation
 ```
 
 ---
 
-## Git and GitHub Usage
+## 🧠 Tasks Overview
 
-### Repository
+### ✅ Task 1: Git & EDA
 
-Hosted on GitHub with CI/CD using `.github/workflows/ci.yml`.
+* Cleaned and filtered datasets for 2020
+* Performed topic modeling, publication frequency analysis, and headline stats
+* Scripts: `src/data_utils.py`, `src/nlp_utils.py`, `src/time_series_utils.py`, `src/publisher_utils.py`
 
-### Branches
+### ✅ Task 2: Quantitative Analysis
 
-- `task-1`: Project setup, data cleaning, and exploratory data analysis (EDA)
-- `task-2`: Quantitative analysis with technical indicators
-- `task-3`: Correlation analysis between news sentiment and stock returns
-- `dashboard`: Streamlit dashboard development and integration
+* Computed SMA, RSI, MACD, Bollinger Bands, ADX, Stochastic Oscillator
+* Script: `src/finance_utils.py`
+* Saved indicators to `data/aapl_with_indicators_2020.csv`
 
-All tasks merged into `main`.
+### ✅ Task 3: Sentiment & Correlation
 
-### Commit Examples
+* Performed sentiment analysis using TextBlob
+* Correlated sentiment scores with AAPL returns
+* Script: `src/correlation_analysis.py`
 
-- `Added data cleaning for 2020`
-- `Completed topic modeling`
-- `Implemented technical indicators`
-- `Added sentiment correlation analysis`
-- `Deployed Streamlit dashboard`
+### ✅ Dashboard (Streamlit)
 
----
+* App: `src/dashboard.py`
+* Features: metrics, charts (SMA, RSI), sentiment-return correlation
+* Run with:
 
-## Tasks
-
-### Task 1: Git, GitHub, and EDA
-
-#### Setup
-
-- Python 3.10, 3.11, 3.12
-- Installed requirements from `requirements.txt`
-
-#### Data Cleaning
-
-- Cleaned: `raw_analyst_ratings.csv`, `AAPL_historical_data.csv`
-- Filtered for 2020 and saved:
-  - `data/fnspid_news_cleaned_2020.csv`
-  - `data/stock_prices_cleaned_2020.csv`
-
-#### Exploratory Data Analysis
-
-- **Descriptive Statistics**: Headline length, publisher frequency
-- **Topic Modeling**: Common themes like price targets
-- **Time Series Analysis**: Peak publish time ~9 AM UTC
-- **Publisher Analysis**: Top publishers and domains
-
-Scripts used:
-
-- `src/data_utils.py`
-- `src/nlp_utils.py`
-- `src/time_series_utils.py`
-- `src/publisher_utils.py`
+```bash
+streamlit run src/dashboard.py
+```
 
 ---
 
-### Task 2: Quantitative Analysis
+## 🧪 Deliverables
 
-#### Stock Data Preparation
+### 📁 Data Files
 
-- Merged `stock_prices_cleaned_2020.csv` and `sp500_historical_data_2020.csv`
+* `data/fnspid_news_cleaned_2020.csv`
+* `data/stock_prices_cleaned_2020.csv`
+* `data/aapl_with_indicators_2020.csv`
+* `data/sentiment_returns_aapl_2020.csv`
 
-#### Technical Indicators
+### 📊 Plots
 
-Computed:
+* `plots/aapl_sma_2020.png`
+* `task-3-plots/sentiment_vs_returns_aapl.png`
 
-- SMA-20
-- RSI-14
-- MACD
-- Bollinger Bands
-- ADX
-- Stochastic Oscillator
+### 📓 Notebooks
 
-Saved results to:
-
-- `data/aapl_with_indicators_2020.csv`
-
-Visuals:
-
-- `plots/aapl_sma_2020.png`
-- `plots/aapl_vs_sp500_2020.png`
-
-Functions in `src/finance_utils.py`:
-
-- `load_stock_data`
-- `compute_technical_indicators`
+* `notebooks/data_cleaning.ipynb`
+* `notebooks/descriptive_statistics.ipynb`
+* `notebooks/topic_modeling.ipynb`
+* `notebooks/correlation_analysis.ipynb`
 
 ---
 
-### Task 3: Correlation Analysis
+## 🙏 Acknowledgments
 
-#### Sentiment Analysis
-
-- Used TextBlob
-- Aggregated sentiment by day into `data/sentiment_returns_aapl_2020.csv`
-
-#### Stock Returns & Correlation
-
-- Computed daily returns
-- Pearson correlation (lags: 0 to 3 days)
-- Scatter plot: `task-3-plots/sentiment_vs_returns_aapl.png`
-
-Functions in `src/correlation_analysis.py`:
-
-- `perform_sentiment_analysis`
-- `calculate_stock_returns`
-- `align_data`
-- `calculate_correlation`
-- `plot_correlation`
+Special thanks to **10 Academy** for this challenge opportunity. Built using Python, Streamlit, Plotly, TA-Lib, and NLP libraries.
 
 ---
 
-## Dashboard
+## 🔗 Repository
 
-> **Note**: Deployment postponed for future work. Run locally with `streamlit run src/dashboard.py`.
-
-### Development
-
-- Streamlit app in `src/dashboard.py`
-- Features:
-  - Metrics: closing price, volatility, return
-  - Charts: SMA, RSI, MACD
-  - Correlation: sentiment vs. returns
-
----
-
-## Deliverables
-
-- GitHub Repo: [https://github.com/emegua19/news-sentiment-stock-analysis-week1](https://github.com/emegua19/news-sentiment-stock-analysis-week1)
-
----
-
-## Key Outputs
-
-### Data
-
-- `data/fnspid_news_cleaned_2020.csv`
-- `data/stock_prices_cleaned_2020.csv`
-- `data/aapl_with_indicators_2020.csv`
-- `data/sentiment_returns_aapl_2020.csv`
-
-### Plots
-
-- **Task 1**:
-  - `task-1-plots/headline_length_distribution_2020.png`
-  - `task-1-plots/publication_frequency_2020.png`
-  - `task-1-plots/publisher_counts_2020.png`
-- **Task 2**:
-  - `task-2-plots/aapl_sma_2020.png`
-- **Task 3**:
-  - `task-3-plots/sentiment_vs_returns_aapl.png`
-
-### Notebooks
-
-- `notebooks/data_cleaning.ipynb`
-- `notebooks/descriptive_statistics.ipynb`
-- `notebooks/topic_modeling.ipynb`
-- `notebooks/time_series_analysis.ipynb`
-- `notebooks/publisher_analysis.ipynb`
-- `notebooks/quantitative_analysis.ipynb`
-- `notebooks/correlation_analysis.ipynb`
-
-### Scripts
-
-- `src/data_utils.py`
-- `src/nlp_utils.py`
-- `src/time_series_utils.py`
-- `src/publisher_utils.py`
-- `src/finance_utils.py`
-- `src/correlation_analysis.py`
-- `src/dashboard.py`
-
----
-
-## Acknowledgments
-
-Thanks to the 10 Academy team for their guidance and support. Built using Python, Streamlit, Plotly, and TA-Lib.
-
-
+[https://github.com/emegua19/news-sentiment-stock-analysis-week1](https://github.com/emegua19/news-sentiment-stock-analysis-week1)
+```
